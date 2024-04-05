@@ -11,7 +11,6 @@ namespace D.W.C.API.D.W.C.Service
             : base(options)
         {
         }
-        public DbSet<WorkItemDetails> WorkItems { get; set; }
         public DbSet<WorkItemHistory> WorkItemsHistory { get; set; }
         public DbSet<Iteration> Iterations { get; set; }
         public DbSet<WorkItemsList> WorkItem {  get; set; }
