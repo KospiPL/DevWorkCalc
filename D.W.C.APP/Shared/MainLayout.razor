@@ -1,0 +1,105 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavigationManager
+@inject AuthenticationService AuthenticationService
+@using D.W.C.APP.Service
+
+<div class="page @(isUserAuthenticated ? "" : "not-authenticated")">
+    @if (isUserAuthenticated)
+    {
+        <nav id="sidebar" class="sidebar @(collapseNavMenu ? "collapsed" : "")" role="navigation">
+            <NavMenu CollapseNavMenu="@collapseNavMenu" />
+        </nav>
+
+        <header class="top-row">
+            <button @onclick="ToggleNavMenu" class="nav-toggle-button" aria-label="Toggle navigation menu"></button>
+            <button @onclick="Settings" class="button-icon" aria-label="Settings"></button>
+            <button @onclick="Logout" class="button-out" aria-label="Logout"></button>
+        </header>
+    }
+
+    <main class="@GetMainContentCssClass()" role="main">
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private bool isUserAuthenticated = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await localStorage.GetItemAsync<string>("userToken");
+        var isAuthenticated = !string.IsNullOrEmpty(token);
+        AuthenticationService.UpdateAuthenticationState(isAuthenticated);
+
+        
+#if DEBUG
+    isUserAuthenticated = true; 
+#else
+        await CheckUserAuthentication();
+#endif
+    }
+
+    private async Task CheckUserAuthentication()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        isUserAuthenticated = authState.User.Identity.IsAuthenticated;
+
+        bool isOnLoginPage = NavigationManager.Uri.EndsWith("/login");
+        bool shouldNavigateToMain = isUserAuthenticated && isOnLoginPage;
+        bool shouldNavigateToLogin = !isUserAuthenticated && !isOnLoginPage && !NavigationManager.Uri.EndsWith("/main");
+
+        if (shouldNavigateToMain)
+        {
+            NavigationManager.NavigateTo("/main");
+        }
+        else if (shouldNavigateToLogin)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+
+        // Logika dotycząca ustawień UI, jak wcześniej
+        var storedValue = await localStorage.GetItemAsync<string>("collapseNavMenu");
+        collapseNavMenu = storedValue == null ? true : bool.Parse(storedValue);
+    }
+
+
+
+    private async void HandleAuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        await CheckUserAuthentication();
+        StateHasChanged();
+    }
+
+    private string GetMainContentCssClass()
+    {
+        return isUserAuthenticated && !collapseNavMenu ? "main-content" : "main-content full-width";
+    }
+
+    private async Task ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+        await localStorage.SetItemAsync("collapseNavMenu", collapseNavMenu.ToString());
+    }
+
+    private async Task Logout()
+    {
+        await localStorage.RemoveItemAsync("userToken");
+        isUserAuthenticated = false;
+        NavigationManager.NavigateTo("/login", forceLoad: true);
+    }
+    public void Settings()
+    {
+        
+    }
+    public void Dispose()
+    {
+        AuthenticationStateProvider.AuthenticationStateChanged -= HandleAuthenticationStateChanged;
+    }
+}
+

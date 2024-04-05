@@ -1,0 +1,211 @@
+﻿.nav-menu {
+    display: flex;
+    flex-direction: column;
+    width: 360px;
+    justify-content: space-between;
+    height: 100%;
+    align-items: flex-start;
+}
+
+    .nav-menu.collapsed {
+        width: 61px;
+    }
+
+        .nav-menu.collapsed .nav-item {
+            justify-content: center; /* Zmieniamy na center, żeby ikony były na środku */
+            padding-left: 0; /* Upewniamy się, że nie ma dodatkowego paddingu po lewej */
+            padding-right: 0;
+            flex-direction: column;
+        }
+
+            .nav-menu.collapsed .nav-item .project-icon {
+                /* Jeśli chcesz przesunąć ikonę na lewo, może być potrzebny margines lub dodatkowe ustawienie pozycji */
+                margin-left: -100%; /* Dostosuj tę wartość, aby przesunąć ikonę na lewo */
+            }
+
+.user-profile {
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    flex-direction: row;
+    width: 101%;
+}
+
+.profile-icon {
+    width: 50px;
+    height: 50px;
+    flex-grow: 0;
+    align-items: center; /* Centruje elementy pionowo */
+    justify-content: center;
+}
+
+.nav-items {
+    list-style: none;
+    padding-left: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+    .nav-items .nav-item:first-child {
+        margin-top: 10px;
+    }
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    text-decoration: none;
+    color: white;
+    justify-content: start;
+    width: 100%;
+}
+
+.nav-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 1rem;
+}
+
+.nav-menu.collapsed .nav-item {
+    justify-content: start;
+    padding-left: 0;
+    padding-right: 0;
+    flex-direction: column;
+}
+
+.nav-menu.collapsed .nav-icon {
+    margin-right: 0;
+    align-items: center; /* Centruje elementy pionowo */
+    justify-content: center;
+}
+
+.nav-menu.collapsed .nav-item .nav-icon {
+    margin-top: 0px;
+}
+
+.nav-menu.collapsed .nav-text,
+.nav-menu.collapsed .profile-name {
+    display: none;
+}
+
+.nav-items.bottom-items {
+    margin-top: auto;
+    width: 100%;
+}
+
+.nav-menu.collapsed .profile-icon {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-right: -4px; /* Centruje elementy pionowo */
+    justify-content: center;
+}
+
+user-profile + .nav-items .nav-item:first-child {
+    margin-top: -80%;
+}
+
+.nav-text {
+    flex-grow: 0;
+    font-family: Poppins;
+    font-size: 16px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: 0.8px;
+    text-align: left;
+    color: white;
+}
+
+.profile-name {
+    width: 290px;
+    height: 30px;
+    flex-grow: 10;
+    font-family: Poppins;
+    font-size: 20px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: 1px;
+    text-align: left;
+    color: #fff;
+}
+
+.nav-dropdown {
+    list-style: none;
+    padding-left: 0;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin-top: 10px;
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+    max-height: 0;
+}
+
+    .nav-dropdown.collapsed {
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        background-color: rgba(255, 255, 255, 0.5);
+        max-height: 0;
+        display: ruby-text;
+    }
+
+    .nav-dropdown:not(.collapsed) {
+        max-height: 200px; /* Maksymalna wysokość, jaką lista może przyjąć. */
+        visibility: visible; /* Lista jest teraz widoczna */
+    }
+
+.nav-dropdown-item {
+    width: 330px;
+    height: 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 175px;
+    margin: 10px 10px 20px 20px;
+    padding: 5px 20px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+    .nav-dropdown-item.collapsed {
+        display: none;
+        visibility: hidden;
+    }
+
+.container-project {
+    height: 100%;
+    align-items: center;
+}
+
+    .container-project.collapsed {
+        align-items: center; /* Centruje elementy pionowo */
+        justify-content: center;
+        display: none;
+    }
+
+.nav-item nav-dropdown-toggle.collapsed {
+    left: 100%;
+    padding-left: 100%;
+}
+
+.nav-itema {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    text-decoration: none;
+    color: white;
+    justify-content: start;
+    width: 100%;
+}
+
+.nav-menu.collapsed .nav-dropdown-item {
+    display: none;
+}
