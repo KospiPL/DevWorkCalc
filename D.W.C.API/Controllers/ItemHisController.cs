@@ -18,24 +18,27 @@ namespace D.W.C.API.Controllers
 
         // GET: api/ItemDet
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<WorkItemHistory>>> GetItemDet()
+        public async Task<ActionResult<IEnumerable<WorkItemHistory>>> GetWorkItemHisotry()
         {
             return await _context.WorkItemsHistory.ToListAsync();
         }
 
-        // GET: api/ItemDet/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<WorkItemHistory>> GetItemDet(int id)
+        // GET: api/ItemDet/History/5
+        [HttpGet("History/{id}")]
+        public async Task<ActionResult<IEnumerable<WorkItemHistory>>> GetWorkItemHistory(int id)
         {
-            var itemDet = await _context.WorkItemsHistory.FindAsync(id);
+            var historyItems = await _context.WorkItemsHistory
+                .Where(h => h.ApiId == id)
+                .ToListAsync();
 
-            if (itemDet == null)
+            if (historyItems == null || historyItems.Count == 0)
             {
                 return NotFound();
             }
 
-            return itemDet;
+            return historyItems;
         }
+
 
         // PUT: api/ItemDet/5
         [HttpPut("{id}")]
@@ -74,7 +77,7 @@ namespace D.W.C.API.Controllers
             _context.WorkItemsHistory.Add(itemDet);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetItemDet), new { id = itemDet.Id }, itemDet);
+            return CreatedAtAction(nameof(GetWorkItemHisotry), new { id = itemDet.Id }, itemDet);
         }
 
         // DELETE: api/ItemDet/5
