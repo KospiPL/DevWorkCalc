@@ -192,7 +192,7 @@ namespace D.W.C.Api.Controllers
                 var latestIterations = iterationListDto.Value
                     .Where(i => i.Attributes.StartDate.HasValue && i.Attributes.StartDate.Value <= currentDate)
                     .OrderByDescending(i => i.Attributes.StartDate)
-                    .Take(2) // Pobieranie trzech ostatnich sprintów
+                    .Take(4) // Pobieranie trzech ostatnich sprintów
                     .ToList();
 
                 if (!latestIterations.Any())

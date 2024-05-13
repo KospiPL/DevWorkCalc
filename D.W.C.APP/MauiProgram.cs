@@ -7,7 +7,6 @@ using D.W.C.APP.Shared;
 using D.W.C.APP.Service;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Components.Authorization;
-using static D.W.C.APP.Shared.MainLayout;
 
 namespace D.W.C.APP
 {
@@ -40,7 +39,7 @@ namespace D.W.C.APP
 
 
             // Rejestracja serwisu GoogleAuthService
-            builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+            //builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
             // Rejestracja klienta HTTP
             builder.Services.AddScoped<HttpClient>();
