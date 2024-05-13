@@ -1,7 +1,55 @@
 ﻿@page "/reports"
+@using D.W.C.Lib.D.W.C.Models
+@using D.W.C.APP.Service
+@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components
 
-<h3>ReportsPage</h3>
+
+<h3>Reports Page</h3>
+
+<div class="@GetMainContentCssClass()">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID Zadania</th>
+                <th>Osoba przypisana</th>
+                <th>Projekt</th>
+                <th>Tytył</th>
+                <th>Data Rozpoczęcia</th>
+                <th>Data Zakończenia</th>
+                <th>Work Time (Hours)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in tasks)
+            {
+                <tr>
+                    <td>@task.Id</td>
+                    <td>@task.DisplayName</td>
+                    <td>@task.AreaPath</td>
+                    <td>@task.Title</td>
+                    <td>@task.ActivatedDate)</td>
+                    <td>@task.ResolvedDate</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 @code {
+    List<WorkItemDetails> tasks = new List<WorkItemDetails>();
+    private TaskService taskService = new TaskService();
 
+
+    protected override async Task OnInitializedAsync()
+    {
+        tasks = await taskService.GetTasksAsync();
+    }
+    [CascadingParameterAttribute]
+    public bool CollapseNavMenu { get; set; }
+
+    private string GetMainContentCssClass()
+    {
+        return @CollapseNavMenu ? "main-collapsed" : "main-expanded";
+    }
 }

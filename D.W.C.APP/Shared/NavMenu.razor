@@ -22,7 +22,22 @@
         </div>
     </div>
     <ul class="nav-items bottom-items">
-        ...
+        <li class="nav-item" @onclick="NavigatePracownicy">
+            <img src="/images/uzytkownik.svg" alt="Pracownicy" class="nav-icon" />
+            <span class="nav-text">Pracownicy</span>
+        </li>
+        <li class="nav-item" @onclick="NavigateCzas">
+            <img src="/images/zegar.svg" alt="Czas" class="nav-icon" />
+            <span class="nav-text">Czas</span>
+        </li>
+        <li class="nav-item" @onclick="NavigateRaporty">
+            <img src="/images/raport.svg" alt="Raporty" class="nav-icon" />
+            <span class="nav-text">Raporty</span>
+        </li>
+        <li class="nav-item" @onclick="NavigateKalendarz">
+            <img src="/images/kalendarz.svg" alt="Kalendarz" class="nav-icon" />
+            <span class="nav-text">Kalendarz</span>
+        </li>
     </ul>
 </div>
 
@@ -54,9 +69,31 @@
         projectsDropdownOpen = !projectsDropdownOpen;
     }
 
+    private async Task NavigatePracownicy()
+    {
+        NavigationManager.NavigateTo("/employees");
+    }
+
+    private async Task NavigateCzas()
+    {
+        NavigationManager.NavigateTo("/time");
+    }
+
+    private async Task NavigateRaporty()
+    {
+        NavigationManager.NavigateTo("/reports");
+    }
+
+    private async Task NavigateKalendarz()
+    {
+        NavigationManager.NavigateTo("/calendar");
+    }
+
     public class ProjectItem
     {
         public string Name { get; set; }
-        public string Url { get; set; } 
+        public string Url { get; set; }
     }
+
+
 }

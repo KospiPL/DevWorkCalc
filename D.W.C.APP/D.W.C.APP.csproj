@@ -61,8 +61,12 @@
         <PackageReference Include="Google.Apis.Auth" Version="1.67.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.16" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Identity.Client" Version="4.59.0" />
+        <PackageReference Include="Microsoft.Identity.Client" Version="4.60.3" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\D.W.C.Lib\D.W.C.Lib.csproj" />
     </ItemGroup>
 
 </Project>

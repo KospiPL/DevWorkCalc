@@ -6,29 +6,31 @@
 @inject AuthenticationService AuthenticationService
 @using D.W.C.APP.Service
 
-<div class="page @(isUserAuthenticated ? "" : "not-authenticated")">
-    @if (isUserAuthenticated)
-    {
-        <nav id="sidebar" class="sidebar @(collapseNavMenu ? "collapsed" : "")" role="navigation">
-            <NavMenu CollapseNavMenu="@collapseNavMenu" />
-        </nav>
+<CascadingValue Value="collapseNavMenu">
+    <div class="page @(isUserAuthenticated ? "" : "not-authenticated")">
+        @if (isUserAuthenticated)
+        {
+            <nav id="sidebar" class="sidebar @(collapseNavMenu ? "collapsed" : "")" role="navigation">
+                <NavMenu CollapseNavMenu="@collapseNavMenu" />
+            </nav>
 
-        <header class="top-row">
-            <button @onclick="ToggleNavMenu" class="nav-toggle-button" aria-label="Toggle navigation menu"></button>
-            <button @onclick="Settings" class="button-icon" aria-label="Settings"></button>
-            <button @onclick="Logout" class="button-out" aria-label="Logout"></button>
-        </header>
-    }
+            <header class="top-row">
+                <button @onclick="ToggleNavMenu" class="nav-toggle-button" aria-label="Toggle navigation menu"></button>
+                <button @onclick="Settings" class="button-icon" aria-label="Settings"></button>
+                <button @onclick="Logout" class="button-out" aria-label="Logout"></button>
+            </header>
+        }
 
-    <main class="@GetMainContentCssClass()" role="main">
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+        <main class="@GetMainContentCssClass()" role="main">
+            <article class="content px-4">
+                @Body
+            </article>
+        </main>
+    </div>
+</CascadingValue>
 
 @code {
-    private bool collapseNavMenu = true;
+    public bool collapseNavMenu = true;
     private bool isUserAuthenticated = false;
 
     protected override async Task OnInitializedAsync()
