@@ -2,54 +2,131 @@
 @using D.W.C.Lib.D.W.C.Models
 @using D.W.C.APP.Service
 @inherits LayoutComponentBase
+@using Blazorise.Charts
+@using Blazorise
 @using Microsoft.AspNetCore.Components
 
-
-<h3>Reports Page</h3>
-
-<div class="@GetMainContentCssClass()">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID Zadania</th>
-                <th>Osoba przypisana</th>
-                <th>Projekt</th>
-                <th>Tytył</th>
-                <th>Data Rozpoczęcia</th>
-                <th>Data Zakończenia</th>
-                <th>Work Time (Hours)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var task in tasks)
-            {
-                <tr>
-                    <td>@task.Id</td>
-                    <td>@task.DisplayName</td>
-                    <td>@task.AreaPath</td>
-                    <td>@task.Title</td>
-                    <td>@task.ActivatedDate)</td>
-                    <td>@task.ResolvedDate</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<div class="container-fluid @GetMainContentCssClass()">
+    <div class="container-raports p-4">
+        <div class="search-sort-criteria mb-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" placeholder="Wyszukaj po Osobie" @bind="personCriteria" @oninput="FilterTasks" />
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" placeholder="Wyszukaj po Projekcie" @bind="projectCriteria" @oninput="FilterTasks" />
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select" @bind="sprintCriteria">
+                        <option value="">Wybierz Iteration Path</option>
+                        @foreach (var iteration in iterationPaths)
+                        {
+                            <option value="@iteration">@iteration</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID Zadania</th>
+                            <th>Osoba przypisana</th>
+                            <th>Projekt</th>
+                            <th>Tytył</th>
+                            <th>Data Rozpoczęcia</th>
+                            <th>Data Zakończenia</th>
+                            <th>Work Time (Hours)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var task in filteredTasks)
+                        {
+                            <tr>
+                                <td>@task.Id</td>
+                                <td>@task.DisplayName ?? "N/A"</td>
+                                <td>@task.AreaPath ?? "N/A"</td>
+                                <td>@task.Title ?? "N/A"</td>
+                                <td>@task.ActivatedDate?.ToString("yyyy-MM-dd") ?? "N/A"</td>
+                                <td>@task.ResolvedDate?.ToString("yyyy-MM-dd") ?? "N/A"</td>
+                                <td>@task.WorkTime?.ToString() ?? "N/A"</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-4">
+                <BarChart @ref="workTimeChart" TItem="decimal">
+                    <ChartOptions>
+                        <ChartOptionsResponsive Item>
+                            <ChartOptionsScales>
+                                <ChartOptionsScalesYAxis BeginAtZero="true" />
+                            </ChartOptionsScales>
+                        </ChartOptionsResponsive>
+                    </ChartOptions>
+                </BarChart>
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
-    List<WorkItemDetails> tasks = new List<WorkItemDetails>();
+    private List<WorkItemDetails> tasks = new List<WorkItemDetails>();
+    private List<WorkItemDetails> filteredTasks = new List<WorkItemDetails>();
+    private List<string> iterationPaths = new List<string>();
+    private string personCriteria;
+    private string projectCriteria;
+    private string sprintCriteria;
     private TaskService taskService = new TaskService();
-
+    private BarChart<decimal> workTimeChart;
 
     protected override async Task OnInitializedAsync()
     {
         tasks = await taskService.GetTasksAsync();
+        iterationPaths = tasks.Select(t => t.IterationPath).Distinct().ToList();
+        FilterTasks(); // Initialize filteredTasks with the filtered tasks
+        await UpdateChart();
     }
-    [CascadingParameterAttribute]
+
+    private void FilterTasks()
+    {
+        filteredTasks = tasks.Where(t =>
+            (string.IsNullOrEmpty(personCriteria) || (t.DisplayName != null && t.DisplayName.Contains(personCriteria, StringComparison.OrdinalIgnoreCase))) &&
+            (string.IsNullOrEmpty(projectCriteria) || (t.AreaPath != null && t.AreaPath.Contains(projectCriteria, StringComparison.OrdinalIgnoreCase))) &&
+            (string.IsNullOrEmpty(sprintCriteria) || (t.IterationPath != null && t.IterationPath.Equals(sprintCriteria, StringComparison.OrdinalIgnoreCase))) &&
+            (t.BoardColumn == "Resolved" || t.BoardColumn == "Closed")
+        ).ToList();
+        UpdateChart().GetAwaiter().GetResult();
+    }
+
+    private async Task UpdateChart()
+    {
+        if (workTimeChart != null)
+        {
+            var workTimeData = filteredTasks.Select(t => t.WorkTime ?? 0).ToList();
+            var labels = filteredTasks.Select(t => t.Title).ToList();
+
+            await workTimeChart.Clear();
+            await workTimeChart.AddLabelsDatasetsAndUpdate(labels, new BarChartDataset<decimal>
+            {
+                Label = "Work Time (Hours)",
+                Data = workTimeData,
+                BackgroundColor = "rgba(54, 162, 235, 0.2)",
+                BorderColor = "rgba(54, 162, 235, 1)",
+                BorderWidth = 1
+            });
+            // Pan tadeusz Tom pierwszy - dawno temu za lasami na górami w krainie skaczących kangurów
+            // Pan tadeusz Tom drugi - w odległej galaktyce na planecie Proxima B, nasz Skarb narodowy Sławosz Uznański
+        }
+    }
+
+    [CascadingParameter]
     public bool CollapseNavMenu { get; set; }
 
     private string GetMainContentCssClass()
     {
-        return @CollapseNavMenu ? "main-collapsed" : "main-expanded";
+        return CollapseNavMenu ? "main-collapsed" : "main-expanded";
     }
 }

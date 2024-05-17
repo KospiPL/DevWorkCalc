@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Components.WebView.Maui;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Hosting;
-using D.W.C.APP; 
+using D.W.C.APP;
 using Blazored.LocalStorage;
 using D.W.C.APP.Shared;
 using D.W.C.APP.Service;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Components.Authorization;
+using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
 
 namespace D.W.C.APP
 {
@@ -28,7 +31,14 @@ namespace D.W.C.APP
             builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
 
-            // Dodanie lokalnego przechowywania danych
+            builder.Services
+                .AddBlazorise(options =>
+                {
+                    options.Immediate = true;
+                })
+                .AddBootstrapProviders()
+                .AddFontAwesomeIcons();
+
             builder.Services.AddBlazoredLocalStorage();
 
             // Konfiguracja systemu autoryzacji
@@ -36,10 +46,6 @@ namespace D.W.C.APP
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             builder.Services.AddScoped<MicrosoftAuthService>();
             builder.Services.AddScoped<AuthenticationService>();
-
-
-            // Rejestracja serwisu GoogleAuthService
-            //builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
             // Rejestracja klienta HTTP
             builder.Services.AddScoped<HttpClient>();
