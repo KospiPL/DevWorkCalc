@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Components.WebView.Maui;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Maui.Hosting;
-using D.W.C.APP;
-using Blazored.LocalStorage;
+﻿using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Charts;
+using Blazorise.Icons.FontAwesome;
 using D.W.C.APP.Shared;
 using D.W.C.APP.Service;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Components.Authorization;
-using Blazorise;
-using Blazorise.Bootstrap;
-using Blazorise.Icons.FontAwesome;
+using Blazored.LocalStorage;
+using Microsoft.Maui.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Radzen;
 
 namespace D.W.C.APP
 {
@@ -25,29 +25,26 @@ namespace D.W.C.APP
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
-            // Konfiguracja Blazor i usług lokalnych
+            // Configure Blazor and local services
             builder.Services.AddMauiBlazorWebView();
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
 
-            builder.Services
-                .AddBlazorise(options =>
-                {
-                    options.Immediate = true;
-                })
-                .AddBootstrapProviders()
-                .AddFontAwesomeIcons();
+          
 
-            builder.Services.AddBlazoredLocalStorage();
-
-            // Konfiguracja systemu autoryzacji
+            builder.Services.AddBlazoredLocalStorage();           
+            // Configure authentication system
             builder.Services.AddAuthorizationCore();
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             builder.Services.AddScoped<MicrosoftAuthService>();
             builder.Services.AddScoped<AuthenticationService>();
-
-            // Rejestracja klienta HTTP
+            builder.Services.AddScoped<DialogService>();
+            builder.Services.AddScoped<NotificationService>();
+            builder.Services.AddScoped<TooltipService>();
+            builder.Services.AddScoped<ContextMenuService>();
+            builder.Services.AddRadzenComponents();
+            // Register HttpClient
             builder.Services.AddScoped<HttpClient>();
 
 #if DEBUG
