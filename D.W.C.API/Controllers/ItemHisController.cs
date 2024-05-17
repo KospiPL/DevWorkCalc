@@ -20,7 +20,6 @@ namespace D.W.C.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<WorkItemHistory>>> GetWorkItemHisotry()
         {
-            // ala ma kota
             return await _context.WorkItemsHistory.ToListAsync();
         }
 
