@@ -34,5 +34,7 @@ namespace D.W.C.Lib.D.W.C.Models
         public DateTime? ResolvedDate { get; set; }
 
         public string? DisplayName { get; set; }
+        public decimal? WorkTime { get; set; }
+
     }
 }

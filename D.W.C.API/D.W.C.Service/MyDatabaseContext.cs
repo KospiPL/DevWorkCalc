@@ -1,6 +1,8 @@
 ﻿using D.W.C.Lib.D.W.C.Models;
+
 using DevWorkCalc.D.W.C.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
 
 namespace D.W.C.API.D.W.C.Service
@@ -16,16 +18,20 @@ namespace D.W.C.API.D.W.C.Service
         public DbSet<WorkItemsList> WorkItem {  get; set; }
         public DbSet<Uzytkownik> Uzytkownicy { get; set; }
         public DbSet<WorkItemDetails> workItemDetails { get; set; }
+       
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-           
+            
+            var dateTimeConverterForHistory = new ValueConverter<DateTime, DateTime>(
+                v => v.AddHours(2),
+                v => v); // Convert to local time on retrieval
+            
             modelBuilder.Entity<WorkItemDetails>(entity =>
             {
                 entity.ToTable("ITEM_DET");
 
                 entity.HasKey(e => e.Id);
-
 
                 entity.Property(e => e.ApiId).HasColumnName("AP_IID");
                 entity.Property(e => e.Rev).HasColumnName("Rev");
@@ -40,6 +46,7 @@ namespace D.W.C.API.D.W.C.Service
                 entity.Property(e => e.BoardColumn).HasColumnName("BoardColumn").HasMaxLength(255);
                 entity.Property(e => e.ActivatedDate).HasColumnName("ActivatedDate").HasColumnType("DATETIME");
                 entity.Property(e => e.ResolvedDate).HasColumnName("ResolvedDate").HasColumnType("DATETIME");
+                entity.Property(e => e.WorkTime).HasColumnName("WorkTime").HasColumnType("decimal(18, 2)"); 
 
 
             });
@@ -48,12 +55,18 @@ namespace D.W.C.API.D.W.C.Service
             {
                 entity.ToTable("ITEM_HIS");
 
-                entity.HasKey(e => e.Id); 
+                entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.ApiId).HasColumnName("AP_IID");
                 entity.Property(e => e.Rev).HasColumnName("Rev");
-                entity.Property(e => e.OldValueDate).HasColumnName("System_ChangedDate_OldValue");
-                entity.Property(e => e.NewValueDate).HasColumnName("System_ChangedDate_NewValue");
+                entity.Property(e => e.OldValueDate)
+                      .HasColumnName("System_ChangedDate_OldValue")
+                      .HasColumnType("DATETIME")
+                      .HasConversion(dateTimeConverterForHistory);
+                entity.Property(e => e.NewValueDate)
+                      .HasColumnName("System_ChangedDate_NewValue")
+                      .HasColumnType("DATETIME")
+                      .HasConversion(dateTimeConverterForHistory);
                 entity.Property(e => e.OldValueColumn).HasColumnName("System_BoardColumn_OldValue");
                 entity.Property(e => e.NewValueColumn).HasColumnName("System_BoardColumn_NewValue");
             });
