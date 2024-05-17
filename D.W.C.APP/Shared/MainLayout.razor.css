@@ -6,10 +6,7 @@
 }
 
 .page {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
+    margin-right: 0%;
     background-color: #fff;
 }
 

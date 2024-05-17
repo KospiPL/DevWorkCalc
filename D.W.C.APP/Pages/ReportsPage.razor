@@ -1,9 +1,8 @@
 ﻿@page "/reports"
 @using D.W.C.Lib.D.W.C.Models
 @using D.W.C.APP.Service
+@using Radzen
 @inherits LayoutComponentBase
-@using Blazorise.Charts
-@using Blazorise
 @using Microsoft.AspNetCore.Components
 
 <div class="container-fluid @GetMainContentCssClass()">
@@ -11,10 +10,10 @@
         <div class="search-sort-criteria mb-4">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <input type="text" class="form-control" placeholder="Wyszukaj po Osobie" @bind="personCriteria" @oninput="FilterTasks" />
+                    <input type="text" id="personSearch" class="form-control" placeholder="Wyszukaj po Osobie" @bind="personCriteria" @onkeypress="CheckEnterKey" />
                 </div>
                 <div class="col-md-4">
-                    <input type="text" class="form-control" placeholder="Wyszukaj po Projekcie" @bind="projectCriteria" @oninput="FilterTasks" />
+                    <input type="text" id="projectSearch" class="form-control" placeholder="Wyszukaj po Projekcie" @bind="projectCriteria" @onkeypress="CheckEnterKey" />
                 </div>
                 <div class="col-md-4">
                     <select class="form-select" @bind="sprintCriteria">
@@ -25,6 +24,19 @@
                         }
                     </select>
                 </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-8">
+                <RadzenChart>
+                    <RadzenCategoryAxis>
+                        <RadzenAxisLabel Text="Iteration Path" />
+                    </RadzenCategoryAxis>
+                    <RadzenValueAxis>
+                        <RadzenAxisLabel Text="Work Time (Hours)" />
+                    </RadzenValueAxis>
+                    <RadzenColumnSeries Data="@workTimeData" CategoryProperty="IterationPath" ValueProperty="TotalWorkTime" />
+                </RadzenChart>
             </div>
         </div>
         <div class="row">
@@ -46,29 +58,18 @@
                         {
                             <tr>
                                 <td>@task.Id</td>
-                                <td>@task.DisplayName ?? "N/A"</td>
-                                <td>@task.AreaPath ?? "N/A"</td>
-                                <td>@task.Title ?? "N/A"</td>
-                                <td>@task.ActivatedDate?.ToString("yyyy-MM-dd") ?? "N/A"</td>
-                                <td>@task.ResolvedDate?.ToString("yyyy-MM-dd") ?? "N/A"</td>
-                                <td>@task.WorkTime?.ToString() ?? "N/A"</td>
+                                <td>@task.DisplayName</td>
+                                <td>@task.AreaPath</td>
+                                <td>@task.Title</td>
+                                <td>@task.ActivatedDate?.ToString("yyyy-MM-dd")</td>
+                                <td>@task.ResolvedDate?.ToString("yyyy-MM-dd")</td>
+                                <td>@task.WorkTime?.ToString()</td>
                             </tr>
                         }
                     </tbody>
                 </table>
-            </div>
-            <div class="col-md-4">
-                <BarChart @ref="workTimeChart" TItem="decimal">
-                    <ChartOptions>
-                        <ChartOptionsResponsive Item>
-                            <ChartOptionsScales>
-                                <ChartOptionsScalesYAxis BeginAtZero="true" />
-                            </ChartOptionsScales>
-                        </ChartOptionsResponsive>
-                    </ChartOptions>
-                </BarChart>
-            </div>
-        </div>
+            </div>        
+        </div>       
     </div>
 </div>
 
@@ -80,14 +81,21 @@
     private string projectCriteria;
     private string sprintCriteria;
     private TaskService taskService = new TaskService();
-    private BarChart<decimal> workTimeChart;
+    private List<WorkTimeData> workTimeData = new List<WorkTimeData>();
 
     protected override async Task OnInitializedAsync()
     {
-        tasks = await taskService.GetTasksAsync();
-        iterationPaths = tasks.Select(t => t.IterationPath).Distinct().ToList();
-        FilterTasks(); // Initialize filteredTasks with the filtered tasks
-        await UpdateChart();
+        try
+        {
+            tasks = await taskService.GetTasksAsync();
+            iterationPaths = tasks.Select(t => t.IterationPath).Distinct().ToList();
+            FilterTasks();
+            PrepareChartData();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     private void FilterTasks()
@@ -98,28 +106,32 @@
             (string.IsNullOrEmpty(sprintCriteria) || (t.IterationPath != null && t.IterationPath.Equals(sprintCriteria, StringComparison.OrdinalIgnoreCase))) &&
             (t.BoardColumn == "Resolved" || t.BoardColumn == "Closed")
         ).ToList();
-        UpdateChart().GetAwaiter().GetResult();
+        PrepareChartData(); // Aktualizujemy dane wykresu po filtracji
     }
 
-    private async Task UpdateChart()
+    private void PrepareChartData()
     {
-        if (workTimeChart != null)
-        {
-            var workTimeData = filteredTasks.Select(t => t.WorkTime ?? 0).ToList();
-            var labels = filteredTasks.Select(t => t.Title).ToList();
+        workTimeData = filteredTasks
+            .GroupBy(t => t.IterationPath)
+            .Select(g => new WorkTimeData
+                {
+                    IterationPath = g.Key,
+                    TotalWorkTime = g.Sum(t => t.WorkTime ?? 0)
+                }).ToList();
+    }
 
-            await workTimeChart.Clear();
-            await workTimeChart.AddLabelsDatasetsAndUpdate(labels, new BarChartDataset<decimal>
-            {
-                Label = "Work Time (Hours)",
-                Data = workTimeData,
-                BackgroundColor = "rgba(54, 162, 235, 0.2)",
-                BorderColor = "rgba(54, 162, 235, 1)",
-                BorderWidth = 1
-            });
-            // Pan tadeusz Tom pierwszy - dawno temu za lasami na górami w krainie skaczących kangurów
-            // Pan tadeusz Tom drugi - w odległej galaktyce na planecie Proxima B, nasz Skarb narodowy Sławosz Uznański
+    private void CheckEnterKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            FilterTasks();
         }
+    }
+
+    private void HandleSprintChange(ChangeEventArgs e)
+    {
+        sprintCriteria = e.Value.ToString();
+        FilterTasks();
     }
 
     [CascadingParameter]
@@ -128,5 +140,11 @@
     private string GetMainContentCssClass()
     {
         return CollapseNavMenu ? "main-collapsed" : "main-expanded";
+    }
+
+    private class WorkTimeData
+    {
+        public string IterationPath { get; set; }
+        public decimal TotalWorkTime { get; set; }
     }
 }

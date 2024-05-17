@@ -1,22 +1,24 @@
-.main-expanded {
-    margin-left: 355px; /* szerokoœæ rozwiniêtego sidebaru */
-    transition: margin-left 0.5s;
-    
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Ukrywa przewijanie dla ca³ego dokumentu */
 }
 
-.main-collapsed {
-    margin-left: 65px; /* szerokoœæ zwinietego sidebaru */
-    transition: margin-left 0.5s;
-    
-}
 .container-fluid {
     height: 100%;
-
+    display: flex;
+    flex-direction: column;
+    margin-right: 0;
+    overflow: hidden; /* Ukrywa przewijanie dla kontenera */
 }
+
 .container-raports {
+     /* Zapewnia wype³nienie dostêpnej przestrzeni */
     background-color: #f8f9fa;
     border-radius: 8px;
     padding: 20px;
+    overflow-y: auto; /* Dodaje przewijanie, jeœli zawartoœæ jest wiêksza ni¿ wysokoœæ ekranu */
 }
 
 .search-sort-criteria {
@@ -38,3 +40,29 @@
     .table tbody tr:hover {
         background-color: #f1f1f1;
     }
+
+/* Styl dla RadzenChart */
+.radzen-chart {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.radzen-chart-axis-label {
+    font-weight: bold;
+}
+
+/* Dodane stylowanie dla poprawnego wyrównania */
+.main-expanded {
+    margin-left: 355px; /* szerokoœæ rozwiniêtego sidebaru */
+    transition: margin-left 0.5s;
+    width: calc(100% - 355px); /* Uwzglêdnia szerokoœæ sidebaru */
+}
+
+.main-collapsed {
+    margin-left: 65px; /* szerokoœæ zwinietego sidebaru */
+    
+    width: calc(100% - 65px); /* Uwzglêdnia szerokoœæ sidebaru */
+}
