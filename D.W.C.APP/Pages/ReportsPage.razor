@@ -16,7 +16,7 @@
                     <input type="text" id="projectSearch" class="form-control" placeholder="Wyszukaj po Projekcie" @bind="projectCriteria" @onkeypress="CheckEnterKey" />
                 </div>
                 <div class="col-md-4">
-                    <select class="form-select" @bind="sprintCriteria">
+                    <select class="form-select" @onchange="HandleSprintChange">
                         <option value="">Wybierz Iteration Path</option>
                         @foreach (var iteration in iterationPaths)
                         {
@@ -39,37 +39,21 @@
                 </RadzenChart>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-8">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID Zadania</th>
-                            <th>Osoba przypisana</th>
-                            <th>Projekt</th>
-                            <th>Tytył</th>
-                            <th>Data Rozpoczęcia</th>
-                            <th>Data Zakończenia</th>
-                            <th>Work Time (Hours)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var task in filteredTasks)
-                        {
-                            <tr>
-                                <td>@task.Id</td>
-                                <td>@task.DisplayName</td>
-                                <td>@task.AreaPath</td>
-                                <td>@task.Title</td>
-                                <td>@task.ActivatedDate?.ToString("yyyy-MM-dd")</td>
-                                <td>@task.ResolvedDate?.ToString("yyyy-MM-dd")</td>
-                                <td>@task.WorkTime?.ToString()</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>        
-        </div>       
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <RadzenDataGrid @ref="dataGrid" Data="@filteredTasks" TItem="WorkItemDetails" RowSelect="OnRowSelect" AllowFiltering="true" AllowPaging="true" PageSize="12">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="WorkItemDetails" Property="Id" Title="ID Zadania" />
+                        <RadzenDataGridColumn TItem="WorkItemDetails" Property="DisplayName" Title="Osoba przypisana" />
+                        <RadzenDataGridColumn TItem="WorkItemDetails" Property="AreaPath" Title="Projekt" />
+                        <RadzenDataGridColumn TItem="WorkItemDetails" Property="Title" Title="Tytuł" />
+                        <RadzenDataGridColumn TItem="WorkItemDetails" Property="ActivatedDate" Title="Data Rozpoczęcia" FormatString="{0:yyyy-MM-dd}" />
+                        <RadzenDataGridColumn TItem="WorkItemDetails" Property="ResolvedDate" Title="Data Zakończenia" FormatString="{0:yyyy-MM-dd}" />
+                        <RadzenDataGridColumn TItem="WorkItemDetails" Property="WorkTime" Title="Work Time (Hours)" />
+                    </Columns>
+                </RadzenDataGrid>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -82,6 +66,7 @@
     private string sprintCriteria;
     private TaskService taskService = new TaskService();
     private List<WorkTimeData> workTimeData = new List<WorkTimeData>();
+    private RadzenDataGrid<WorkItemDetails> dataGrid;
 
     protected override async Task OnInitializedAsync()
     {
@@ -132,6 +117,11 @@
     {
         sprintCriteria = e.Value.ToString();
         FilterTasks();
+    }
+
+    private void OnRowSelect(WorkItemDetails task)
+    {
+        Console.WriteLine($"Selected Task ID: {task.Id}");
     }
 
     [CascadingParameter]
