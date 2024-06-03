@@ -1,6 +1,4 @@
-﻿using Microsoft.Maui.Controls;
-
-namespace D.W.C.APP
+﻿namespace D.W.C.APP
 {
     public partial class App : Application
     {
