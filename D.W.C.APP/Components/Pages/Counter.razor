@@ -1,16 +1,43 @@
-﻿@page "/counter"
+@page "/calendar"
 
-<h1>Counter</h1>
+@using Radzen
+@using Radzen.Blazor
 
-<p role="status">Current count: @currentCount</p>
-
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
 @code {
-    private int currentCount = 0;
-
-    private void IncrementCount()
+    private List<Appointment> appointments = new List<Appointment>
     {
-        currentCount++;
+        new Appointment { Start = DateTime.Now, End = DateTime.Now.AddHours(1), Text = "Spotkanie" }
+    };
+
+    private Appointment selectedAppointment = new Appointment();
+    private bool isDialogVisible = false;
+
+    public class Appointment
+    {
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+        public string Text { get; set; }
+    }
+
+    private void ShowDialog()
+    {
+        selectedAppointment = new Appointment { Start = DateTime.Now, End = DateTime.Now.AddHours(1) };
+        isDialogVisible = true;
+    }
+
+    private void SaveAppointment()
+    {
+        if (!appointments.Contains(selectedAppointment))
+        {
+            appointments.Add(selectedAppointment);
+        }
+        isDialogVisible = false;
+    }
+
+    private void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
+    {
+        selectedAppointment = args.Data;
+        isDialogVisible = true;
     }
 }

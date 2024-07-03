@@ -58,10 +58,20 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+        <PackageReference Include="Custom.Radzen.Blazor" Version="4.3.6" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.6" />
+        <PackageReference Include="Microsoft.Identity.Client" Version="4.47.2" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+        <PackageReference Include="Radzen.Blazor" Version="4.32.3" />
+        <PackageReference Include="Saapp.UI.Radzen.Blazor" Version="3.13.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\D.W.C.Lib\D.W.C.Lib.csproj" />
     </ItemGroup>
 
 </Project>
